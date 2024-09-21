@@ -25,8 +25,6 @@ Part 2 - Set up Database
    MONGODB_URI="mongodb+srv://<username>:<password>@<cluster-url>/test?retryWrites=true&w=majority"
    Replacing <> with own database cluster
 5. Run npm dev to run test to connect to database
-6. run the createCollections command to create collections
-   "node createCollections.js"
 
 Part 3 - Build and Run Docker
 
