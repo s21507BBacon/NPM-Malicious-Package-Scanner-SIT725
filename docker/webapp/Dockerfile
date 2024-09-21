@@ -1,20 +1,20 @@
-# Use an official Node runtime as the parent image
-FROM node:14
+# Web App Dockerfile
+# Created by Bryce Bacon on 21/09/2024
 
-# Set the working directory in the container
+# Use Node.js as the base image
+FROM node:18
+
+# Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy package.json and package-lock.json files
+COPY ../../package*.json ./
 
-# Install project dependencies
-RUN npm install
-
-# Copy project files into the docker image
+# Copy the rest of the application code
 COPY . .
 
-# Make port 3000 available outside this container
+# Expose the application port
 EXPOSE 3000
 
-# Define the command to run your scanner app
-CMD [ "node", "src/scanner.js" ]
+# Define the command to run the app
+CMD ["npm", "start"]

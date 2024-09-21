@@ -31,3 +31,15 @@ Part 2 - Set up Database
 Part 3 - Build and Run Docker
 
 1. Make sure you have docker and dockerhub installed on your computer
+   NOTE: Please install NPM first or add these lines to docker files to install node.js
+   Place between COPY ../../package\*.json ./ and COPY ../../ .
+   "RUN npm install"
+2. Run "docker-compose build"
+3. After docker has been built
+
+Alternatively, you can pull the latest container from the registry here:
+"docker pull drkae456/npm-malicious-package-scanner-sit725-webapp:v1"
+"docker pull drkae456/npm-malicious-package-scanner-sit725-scanner:v1"
+
+4. Then docker-compose up after either step
+5. Enjoy the application.
