@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scan Results and Weekly Updates</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      input[type="text"],
+      input[type="submit"] {
+        padding: 5px;
+        margin-bottom: 10px;
+      }
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+      .section {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Scan Results and Weekly Updates</h1>
+
+    <div class="section">
+      <h2>View Scan Results</h2>
+      <form id="resultForm">
+        <label for="scanId">Scan ID:</label><br />
+        <input type="text" id="scanId" name="scanId" required /><br />
+        <input type="submit" value="Get Results" />
+      </form>
+      <div id="scanResults"></div>
+    </div>
+
+    <div class="section">
+      <h2>Latest Weekly Update</h2>
+      <button id="getWeeklyUpdate">Get Latest Weekly Update</button>
+      <div id="weeklyUpdate"></div>
+    </div>
+
+    <p><a href="index.html">Back to Scanner</a></p>
+
+    <script>
+      // Function to get URL parameters
+      function getUrlParameter(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+        var results = regex.exec(location.search);
+        return results === null
+          ? ""
+          : decodeURIComponent(results[1].replace(/\+/g, " "));
+      }
+
+      // Automatically fill in scanId if provided in URL
+      var urlScanId = getUrlParameter("scanId");
+      if (urlScanId) {
+        document.getElementById("scanId").value = urlScanId;
+      }
+
+      document
+        .getElementById("resultForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          var scanId = document.getElementById("scanId").value;
+          fetch("/api/scan/" + scanId + "/results")
+            .then((response) => response.json())
+            .then((data) => {
+              var resultsHtml = "<h3>Scan Results</h3>";
+              resultsHtml += "<p>Status: " + data.status + "</p>";
+              if (data.results) {
+                resultsHtml += "<h4>Malicious Packages:</h4>";
+                resultsHtml += "<ul>";
+                data.results.maliciousPackages.forEach(function (pkg) {
+                  resultsHtml += "<li>" + pkg + "</li>";
+                });
+                resultsHtml += "</ul>";
+              }
+              document.getElementById("scanResults").innerHTML = resultsHtml;
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              document.getElementById("scanResults").innerHTML =
+                "Error fetching scan results.";
+            });
+        });
+
+      document
+        .getElementById("getWeeklyUpdate")
+        .addEventListener("click", function () {
+          fetch("/api/weekly-update/latest")
+            .then((response) => response.json())
+            .then((data) => {
+              var updateHtml =
+                "<h3>Update for " +
+                new Date(data.date).toDateString() +
+                "</h3>";
+              updateHtml +=
+                "<p>Repositories Scanned: " +
+                data.content.scannedRepositoriesCount +
+                "</p>";
+              updateHtml +=
+                "<p>Vulnerabilities Found: " +
+                data.content.vulnerabilitiesFound +
+                "</p>";
+              updateHtml += "<h4>Top Vulnerable Packages:</h4>";
+              updateHtml += "<ul>";
+              data.content.topVulnerablePackages.forEach(function (pkg) {
+                updateHtml +=
+                  "<li>" + pkg.name + ": " + pkg.count + " occurrences</li>";
+              });
+              updateHtml += "</ul>";
+              document.getElementById("weeklyUpdate").innerHTML = updateHtml;
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              document.getElementById("weeklyUpdate").innerHTML =
+                "Error fetching weekly update.";
+            });
+        });
+    </script>
+  </body>
+</html>

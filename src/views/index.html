@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repository Scanner</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      h1 {
+        color: #333;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      input[type="text"],
+      input[type="submit"] {
+        padding: 5px;
+        margin-bottom: 10px;
+      }
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Repository Scanner</h1>
+    <p>
+      Enter a repository URL to scan for potential security vulnerabilities.
+    </p>
+
+    <form id="scanForm">
+      <label for="repoUrl">Repository URL:</label><br />
+      <input type="text" id="repoUrl" name="repoUrl" required /><br />
+      <input type="submit" value="Start Scan" />
+    </form>
+    <div id="scanResult"></div>
+
+    <p><a href="scanResults.html">View Scan Results and Weekly Updates</a></p>
+
+    <script>
+      document
+        .getElementById("scanForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          var repoUrl = document.getElementById("repoUrl").value;
+          fetch("/api/scan", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ repositoryUrl: repoUrl }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById("scanResult").innerHTML =
+                "Scan initiated. Scan ID: " +
+                data.scanId +
+                '<br><a href="scanResults.html?scanId=' +
+                data.scanId +
+                '">View Results</a>';
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              document.getElementById("scanResult").innerHTML =
+                "Error initiating scan.";
+            });
+        });
+    </script>
+  </body>
+</html>

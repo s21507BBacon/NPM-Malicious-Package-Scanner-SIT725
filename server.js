@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 // TODO: Add your routes here, for example:
 // app.use('/api/repositories', require('./src/routes/repositoryRoutes'));
 // app.use('/api/scans', require('./src/routes/scanRoutes'));
+app.use(express.static("src/views"));
 
 // Basic route for testing
 app.get("/", (req, res) => {
