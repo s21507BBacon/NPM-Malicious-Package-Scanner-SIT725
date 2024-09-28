@@ -1,0 +1,16 @@
+{
+  "name": "SecureMyGit",
+  "version": "1.0.0",
+  "description": "MVC Node.js Project for managing Git repository uploads",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "U",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.0",
+    "ejs": "^3.1.6"
+  }
+}
