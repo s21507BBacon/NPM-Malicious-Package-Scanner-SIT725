@@ -1,17 +1,41 @@
-const Repo = require('../models/repo');
+const Repo = require('../models/repository');
+const scanService = require('../services/scanService'); // Service that handles the scanning logic
 
 exports.getHomePage = (req, res) => {
-  res.render('index', { message: null }); // Ensure message is passed
+  res.render('index', { message: null });
 };
 
-exports.uploadRepoAddress = (req, res) => {
-  const repoAddress = req.body.repoAddress;
-  const repoType = req.body.repoType;
-  const repoKey = req.body.repoKey || '';
+exports.uploadRepoAddress = async (req, res) => {
+  try {
+    const { repoAddress } = req.body;
 
-  const newRepo = new Repo(repoAddress, repoType, repoKey);
-  console.log('Uploaded Repo:', newRepo);
+    if (!repoAddress) {
+      return res.status(400).json({ error: 'Repository URL is required.' });
+    }
 
-  // Render the index page and pass the success message
-  res.render('index', { message: 'Repository uploaded successfully!' });
+    // Create a new repository entry in the database
+    const newRepo = new Repo({
+      repositoryName: repoAddress.split('/').pop(), // Extract repo name
+      githubUrl: repoAddress,
+      userId: req.user.id, // Assuming user is logged in
+    });
+
+    await newRepo.save();
+
+    // Trigger the scanning service to scan the repository
+    const scanResults = await scanService.scanRepository(repoAddress);
+
+    // Update the repository with scan results
+    newRepo.scanResults.push(scanResults);
+    newRepo.lastScanned = new Date();
+    await newRepo.save();
+
+    return res.status(200).json({
+      message: 'Repository scanned successfully!',
+      results: scanResults,
+    });
+  } catch (error) {
+    console.error('Error uploading repository:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 };

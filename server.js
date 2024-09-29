@@ -1,11 +1,15 @@
 const express = require('express');
 const path = require('path'); 
 const bodyParser = require('body-parser');
+const repoRoutes = require('./src/routes/repoRoutes');  // Repository routes
+const weeklyUpdateRoutes = require('./src/routes/weeklyUpdateRoutes')
 const repoController = require('./src/controllers/repoController');
 const adminController = require('./src/controllers/adminController'); 
 const connectDB = require("./src/config/database");
 const initialiseDatabase = require("./src/config/dbInit");
 require("dotenv").config();
+const cron = require('node-cron'); 
+
 
 const app = express();
 
@@ -22,11 +26,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.get('/', repoController.getHomePage);  // Homepage route
+app.get('/', repoController.getHomePage); // repoController.getHomePage should be a valid function
 app.post('/uploadRepo', repoController.uploadRepoAddress);  // Upload repo route
 
-app.get('/admin', adminController.getAdminPage);  // Admin page route
+app.get('/admin', adminController.getAdminPage); // adminController.getAdminPage should be defined
 app.post('/admin/add', adminController.addMaliciousPackage);  // Add malicious package
+
+// Use repository routes
+app.use('/api/repositories', repoRoutes);
+
+// Use weekly update routes
+app.use('/api/weekly-update', weeklyUpdateRoutes);
+
 
 // Test route
 app.get("/api/test", (req, res) => {
@@ -37,6 +48,13 @@ app.get("/api/test", (req, res) => {
 app.use((err, req, res, next) => {
   console.error("Error:", err.message);
   res.status(500).send("Something broke!");
+});
+
+// Optional: Set up a cron job to automatically send weekly updates every Sunday at midnight
+const weeklyUpdateController = require('./src/controllers/weeklyUpdateController');
+cron.schedule('0 0 * * 0', () => {
+  console.log('Running scheduled weekly update...');
+  weeklyUpdateController.sendWeeklyUpdate();
 });
 
 const PORT = process.env.PORT || 3000;
