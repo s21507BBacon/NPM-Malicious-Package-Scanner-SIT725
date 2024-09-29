@@ -36,8 +36,9 @@ Part 3 - Build and Run Docker
 3. After docker has been built
 
 Alternatively, you can pull the latest container from the registry here:
-"docker pull drkae456/npm-malicious-package-scanner-sit725-webapp:v1"
-"docker pull drkae456/npm-malicious-package-scanner-sit725-scanner:v1"
+"docker pull drkae456/npm-malicious-package-scanner-sit725:v2"
+"docker pull drkae456/npm-malicious-package-scanner-sit725-scanner:v2"
 
 4. Then docker-compose up after either step
+5. It then should run on localport 3000
 5. Enjoy the application.

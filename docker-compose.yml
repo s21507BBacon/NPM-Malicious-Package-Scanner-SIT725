@@ -4,7 +4,7 @@ services:
     build:
       context: ./docker/webapp
       dockerfile: Dockerfile
-    image: drkae456/npm-malicious-package-scanner-sit725-webapp:v1
+    image: drkae456/npm-malicious-package-webapp-sit725:v2
     container_name: webapp_container
     ports:
       - "3000:3000"
@@ -19,7 +19,7 @@ services:
     build:
       context: ./docker/scanner
       dockerfile: Dockerfile
-    image: drkae456/npm-malicious-package-scanner-sit725-scanner:v1
+    image: drkae456/npm-malicious-package-webapp-sit725:v2
     container_name: scanner_container
     ports:
       - "3001:3001"
