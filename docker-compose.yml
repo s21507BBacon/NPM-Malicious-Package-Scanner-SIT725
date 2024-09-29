@@ -2,28 +2,24 @@ version: "3.8"
 
 services:
   webapp:
-    build:
-      context: ./docker/webapp
-      dockerfile: Dockerfile
+    image: drkae456/npm-malicious-package-scanner-sit725-webapp:v1
     container_name: webapp_container
     ports:
       - "3000:3000"
     env_file:
-      - .env # Loads environment variables from the .env file
+      - .env
     volumes:
       - .:/usr/src/app
     depends_on:
       - mongodb
 
   scanner:
-    build:
-      context: ./docker/scanner
-      dockerfile: Dockerfile
+    image: drkae456/npm-malicious-package-scanner-sit725-scanner:v1
     container_name: scanner_container
     ports:
       - "3001:3001"
     env_file:
-      - .env # Loads environment variables from the .env file
+      - .env
     volumes:
       - .:/usr/src/scanner
     depends_on:
@@ -34,6 +30,7 @@ services:
     container_name: mongodb_container
     ports:
       - "27017:27017"
+    env_file:
+    - .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME} # Uses the username from .env
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD} # Uses the password from .env
+      - MONGODB_URI=${MONGODB_URI}
