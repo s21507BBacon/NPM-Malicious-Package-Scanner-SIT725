@@ -11,6 +11,11 @@
   </head>
 
   <body>
+     <!-- Display the message if present -->
+    <% if (message) { %>
+        <p class="alert-message"><%= message %></p>
+    <% } %>
+
     <!-- Navi Bar -->
     <nav id="top-navbar" class="navbar navbar-dark bg-dark fixed-top">
       <div class="container-fluid justify-content-center">

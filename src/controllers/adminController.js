@@ -2,7 +2,7 @@ let maliciousPackages = []; // Temporary storage for the package names
 
 // Render the admin page
 exports.getAdminPage = (req, res) => {
-    res.render('admin', { maliciousPackages });
+    res.render('./views/admin', { maliciousPackages });
 };
 
 // Handle form submission to add a new malicious package
@@ -13,5 +13,5 @@ exports.addMaliciousPackage = (req, res) => {
         maliciousPackages.push(packageName); // Add the package name to the list
     }
 
-    res.redirect('/admin'); // Redirect back to the admin page after submission
+    res.redirect('./views/admin'); // Redirect back to the admin page after submission
 };
