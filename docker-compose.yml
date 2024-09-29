@@ -1,7 +1,9 @@
-version: "3.8"
-
+version: '3'
 services:
   webapp:
+    build:
+      context: ./docker/webapp
+      dockerfile: Dockerfile
     image: drkae456/npm-malicious-package-scanner-sit725-webapp:v1
     container_name: webapp_container
     ports:
@@ -14,6 +16,9 @@ services:
       - mongodb
 
   scanner:
+    build:
+      context: ./docker/scanner
+      dockerfile: Dockerfile
     image: drkae456/npm-malicious-package-scanner-sit725-scanner:v1
     container_name: scanner_container
     ports:
@@ -31,6 +36,8 @@ services:
     ports:
       - "27017:27017"
     env_file:
-    - .env
+      - .env
     environment:
-      - MONGODB_URI=${MONGODB_URI}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGODB_URI: ${MONGODB_URI}

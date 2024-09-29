@@ -1,9 +1,8 @@
 const Repo = require('../models/repo');
 
 exports.getHomePage = (req, res) => {
-  res.render('index');
+  res.render('index', { message: null }); // Ensure message is always passed
 };
-
 exports.uploadRepoAddress = (req, res) => {
   const repoAddress = req.body.repoAddress;
   const repoType = req.body.repoType;

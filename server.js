@@ -1,12 +1,19 @@
-//File created by Bryce Bacon on 21/09/2024
-
-const express = require("express");
+const express = require('express');
+const bodyParser = require('body-parser');
+const repoController = require('./src/controllers/repoController');
+const adminController = require('./src/controllers/adminController'); 
 const connectDB = require("./src/config/database");
 const initialiseDatabase = require("./src/config/dbInit");
 require("dotenv").config();
 
 const app = express();
 
+//views dir
+app.set('views', path.join(__dirname, 'src', 'views'));  // Set path to views folder
+app.set('view engine', 'index.ejs'); // Ensure view engine is set to ejs
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'src', 'public'))); // Set static folder
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,6 +22,12 @@ app.use(express.urlencoded({ extended: true }));
 // TODO: Add your routes here, for example:
 // app.use('/api/repositories', require('./src/routes/repositoryRoutes'));
 // app.use('/api/scans', require('./src/routes/scanRoutes'));
+
+app.get('/src/controllers', repoController.getHomePage);
+app.post('/src/controllers', repoController.uploadRepoAddress);
+
+app.get('/src/controllers', adminController.getAdminPage);
+app.post('/src/controllers', adminController.addMaliciousPackage);
 
 // Basic route for testing
 app.get("/", (req, res) => {
@@ -39,9 +52,7 @@ const startServer = async () => {
     await initialiseDatabase();
 
     app.listen(PORT, () => {
-      console.log(
-        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
-      );
+      console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error.message);
