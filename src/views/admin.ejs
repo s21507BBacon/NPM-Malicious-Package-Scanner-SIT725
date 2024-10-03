@@ -10,12 +10,12 @@
     <div class="container mt-5">
         <h1>Admin Page: Add Malicious Package</h1>
 
-        <form action="/admin/add-package" method="POST">
+        <form action="/admin/add" method="POST">
             <div class="mb-3">
                 <label for="packageName" class="form-label">Package Name</label>
                 <input type="text" class="form-control" id="packageName" name="packageName" placeholder="Enter malicious package name" required>
             </div>
-            <button type="submit" class="btn btn-primary">Add Package</button>
+            <button type="submit" class="btn btn-primary" id="button3">Add Package</button>
         </form>
 
         <h3 class="mt-4">Malicious Packages List:</h3>
@@ -31,5 +31,25 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   <script>
+    document.getElementById("button3").addEventListener("click",fetchMaliciousPackages);
+   async function fetchMaliciousPackages() {
+    try {
+        const response = await fetch('/malicious-packages'); // Adjust the URL based on your server setup
+
+        // Check if the response is OK (status code 200-299)
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json(); // Parse the JSON data
+        console.log('Malicious Packages:', data); // Output the fetched data
+
+        // You can do something with the data here, like updating the UI
+        displayMaliciousPackages(data.data); // Assuming the data is stored in the `data` property
+    } catch (error) {
+        console.error('Error fetching malicious packages:', error);
+    }
+}</script> 
 </body>
 </html>

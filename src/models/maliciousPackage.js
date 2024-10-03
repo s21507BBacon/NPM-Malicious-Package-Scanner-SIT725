@@ -26,7 +26,8 @@ const maliciousPackageSchema = new mongoose.Schema({
   reportedBy: {
     type: mongoose.Schema.Types.ObjectId, // Stores the ObjectId of a related document (a user)
     ref: "User", // References the "User" collection (the user who reported the package)
-    required: true, // This field is mandatory
+    trim: true, // Trims whitespace from both ends of the string
+    //required: true, // This field is mandatory
   },
   // Field to store the date and time when the package was reported
   reportedAt: {
