@@ -1,0 +1,20 @@
+<!-- view.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malicious Packages</title>
+</head>
+<body>
+    <h1>Hello World</h1>
+    <div id="packageList"></div>
+
+    <h1>List of Malicious Packages</h1>
+    <ul>
+        <% maliciousPackages.forEach(package => { %>
+            <li><strong><%= package.packageName %></strong> - <%= package.version %> - <%= package.description %></li>
+        <% }) %>
+    </ul>
+</body>
+</html>
