@@ -7,6 +7,7 @@ const repoController = require('./src/controllers/repoController');
 const adminController = require('./src/controllers/adminController'); 
 const connectDB = require("./src/config/database");
 const initialiseDatabase = require("./src/config/dbInit");
+const gitRoutes = require('./src/routes/gitRoutes');
 require("dotenv").config();
 const cron = require('node-cron'); 
 
@@ -16,7 +17,9 @@ const app = express();
 // Set view engine to EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src', 'views'));
-
+// app.get('/view', (req, res) => {
+//   res.render('view', { maliciousPackages:[] }); // Render the 'view.ejs' file
+// });
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'src', 'public')));
 
@@ -37,8 +40,11 @@ app.use('/api/repositories', repoRoutes);
 
 // Use weekly update routes
 app.use('/api/weekly-update', weeklyUpdateRoutes);
+// Middleware to parse incoming JSON requests
+app.use(express.json());
 
-
+// Use the git routes
+app.use('/api', gitRoutes);
 // Test route
 app.get("/api/test", (req, res) => {
   res.json({ message: "Welcome to the NPM Malicious Package Scanner API" });

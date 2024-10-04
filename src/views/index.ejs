@@ -33,17 +33,17 @@
                 <a class="nav-link" href="#">Sign In</a>
               </li> 
               <li class="nav-item">
-                <a class="nav-link" href="#">Manual</a>
+                <a class="nav-link" href="./view">PackageList</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">New Update
+                <a class="nav-link" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions" id="Update">New Update
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">Community</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/admin">Admin Page</a> 
+                <a class="nav-link" href="./admin">Admin Page</a> 
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">About SecureMyGit</a>
@@ -72,13 +72,13 @@
 
     <!-- User input -->
     <div class="container mt-5">
-      <form action="/upload" method="POST">
+      <form  id="form1">
         <div class="row">
           <div class="col-md-10">
             <input type="text" class="form-control" id="repoAddress" name="repoAddress" placeholder="Enter Repo Address" aria-label="Repo Address">
           </div>
           <div class="col-md-2">
-            <button class="btn btn-primary w-100" type="submit">Upload</button>
+            <button class="btn btn-primary w-100" type="submit" id="button1">Upload</button>
           </div>
         </div>
 
@@ -106,19 +106,141 @@
 
     <script>
       // Toggles visibility of Repo Key input
+
+     
+      
+  function uploadRepo() {
+    const repoAddress = document.getElementById('repoAddress').value;
+    const repoType = document.querySelector('input[name="repoType"]:checked').value;
+    const repoKey = document.getElementById('repoKey').value;
+
+    const data = { repoAddress, repoType, repoKey };
+    const arrayPack=[];
+    fetch('/api/fetch-package-json-updates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log('Success:', result);
+            const feedbackBox = document.getElementById('feedbackBox');
+
+            // Clear previous results
+            feedbackBox.innerHTML = '';
+
+            // Check if package.json and dependencies are present
+            if (result.packageJson ) {
+                const dependencies = result.packageJson;
+                //arrayPack=dependencies;
+
+                // Create a list to display dependencies
+                const ul = document.createElement('ul');
+                for (const [dep, version] of Object.entries(dependencies)) {
+                    const li = document.createElement('li');
+                    li.textContent = `${dep}: ${version}`;
+                    ul.appendChild(li);
+                }
+                
+                // Append the list to the feedback box
+                feedbackBox.appendChild(ul);
+                // Extract only the package names from the array
+                const list = Array.from(dependencies);
+
+console.log("checking here",list,dependencies);
+                scanForMaliciousPackages(list)
+    .then(maliciousPackages => {
+        if (maliciousPackages.length > 0) {
+            console.log('Malicious packages detected:', maliciousPackages);
+        } else {
+            console.log('No malicious packages detected.');
+        }
+    })
+    .catch(error => {
+        console.error('Scan failed:', error);
+    });
+
+            } else {
+                // Handle the case where there are no dependencies
+                const message = document.createElement('p');
+                message.textContent = 'No dependencies found';
+                feedbackBox.appendChild(message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const feedbackBox = document.getElementById('feedbackBox');
+            feedbackBox.innerHTML = ''; // Clear previous results
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'error'; // Add a class for error styling if needed
+            errorMessage.textContent = 'Error fetching package.json: ' + error.message;
+            feedbackBox.appendChild(errorMessage);
+        });
+      };
+
+     
+      document.getElementById('publicRepo').addEventListener('change', toggleKeyInput);
+      document.getElementById('privateRepo').addEventListener('change', toggleKeyInput);
+      document.getElementById("button1").addEventListener("click", function(event){
+      event.preventDefault()
+      });
+      document.getElementById("button1").addEventListener("click",uploadRepo);
       function toggleKeyInput() {
         const privateRepo = document.getElementById('privateRepo').checked;
         const keyInputGroup = document.getElementById('keyInputGroup');
         keyInputGroup.style.display = privateRepo ? 'block' : 'none';
-      }
+      };
+      // Function to scan for malicious packages by names using GET request
+      async function scanForMaliciousPackages(packageJson) {
+    try {
+        // Extract package names from package.json
+        const packageNames = (packageJson);
 
-      document.getElementById('publicRepo').addEventListener('change', toggleKeyInput);
-      document.getElementById('privateRepo').addEventListener('change', toggleKeyInput);
+        // Prepare the data for the POST request
+        const data = { packages: packageNames };
+
+        // Perform the POST request using fetch
+        const response = await fetch('/api/malicious-package-names', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        const scanBox = document.getElementById('ScanBox');
+        // Process the response
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success && result.data.length > 0) {
+                console.log('Malicious packages found:', result.data);
+                scanBox.innerHTML=JSON.stringify('Malicious packages found:')+JSON.stringify( result.data);
+               
+                return result.data;  // Return the malicious packages
+            } else {
+                console.log('No malicious packages found.');
+                scanBox.innerHTML=('No Malicious packages found:');
+                return [];
+            }
+        } else {
+            console.error('Failed to scan malicious packages:', response.statusText);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error during the scan:', error);
+        throw error;
+    }
+}
     </script>
+    
+    
 
     <!-- Feedback box for server messages -->
     <div class="container-fluid mt-5">
       <div class="feedback-box" id="feedbackBox">
+        <!-- Content fed back by the server will appear here -->
+        <% if (typeof message !== 'undefined') { %>
+          <p><%= message %></p>
+        <% } %>
+      </div>
+      <div class="feedback-box" id="ScanBox"></div>
         <!-- Content fed back by the server will appear here -->
         <% if (typeof message !== 'undefined') { %>
           <p><%= message %></p>
